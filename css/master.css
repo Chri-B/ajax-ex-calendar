@@ -1,0 +1,6 @@
+.top-calendar,
+.main-calendar {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
