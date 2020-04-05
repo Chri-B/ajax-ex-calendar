@@ -4,3 +4,13 @@
     align-items: center;
     flex-direction: column;
 }
+
+#nome-mese,
+#calendar li {
+    text-transform: capitalize;
+}
+
+li.festivo {
+    color: red;
+    text-decoration: underline;
+}
