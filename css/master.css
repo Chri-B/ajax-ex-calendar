@@ -1,8 +1,19 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Comic Neue', cursive;
+}
+
 .top-calendar,
 .main-calendar {
     display: flex;
-    align-items: center;
     flex-direction: column;
+}
+
+.top-calendar {
+    align-items: center;
+    padding: 20px;
 }
 
 #nome-mese,
@@ -10,7 +21,69 @@
     text-transform: capitalize;
 }
 
+.main-calendar {
+    margin: 0 auto;
+    width: 60vw;
+    height: 80vh;
+    border: 1px solid black;
+}
+
+.giorni-settimana {
+    width: 60vw;
+    margin: 0 auto;
+}
+
+.giorni-settimana ul li {
+    border-right: 1px solid black;
+}
+
+.giorni-settimana ul li:last-child {
+    border-right:none;
+}
+
+ul {
+    display: flex;
+    flex-wrap: wrap;
+    height: 100%;
+}
+
+li {
+    list-style: none;
+    width: calc(100% / 7);
+    text-align: center;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.main-calendar li {
+}
+
+#calendar li:nth-of-type(even) {
+    background-color: #ececec;
+}
+
 li.festivo {
     color: red;
+    font-weight: 700;
     text-decoration: underline;
+}
+
+.btn-navigation {
+    background-color: red;
+    border: none;
+    border-radius: 10px;
+    padding: 5px 20px;
+    font-size: 15px;
+}
+
+.btn-navigation:hover {
+    cursor: pointer;
+    background-color: rgb(162, 0, 0);
+}
+
+.btn-navigation:disabled {
+    background-color: rgba(0.0, 0.0, 0.0, 0.21);
+    cursor: not-allowed;
 }

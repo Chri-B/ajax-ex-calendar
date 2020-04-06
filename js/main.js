@@ -2,27 +2,60 @@ var htmlGiorno = $('#calendar-template').html();
 var templateGiorno = Handlebars.compile(htmlGiorno);
 
 
-var primaData = moment('2018-01-01');                                           // prima data disponibile
+var primaData = moment('2018-01-01');                                          // prima data disponibile
+var primoGiorno = primaData.isoWeekday();
+console.log(primoGiorno);
+var limiteIniziale = moment('2018-01-01');
+var limiteFinale = moment('2018-12-01');
+
+aggiungiGiorniVuoti(primoGiorno);
 stampaGiorniMese(primaData);                                                    // inizializzazione calendario
 stampaFestivo(primaData);
 
 // al click sul bottone next viene stampato il mese successivo
 $('#next').click(function() {
-    if (primaData.month() < 11) {                                               // se il mese corrente è impostato su dicembre (11), non posso andare avanti con il tasto prev
-        primaData.add(1, 'M');                                                  // funzione add con moment.js - aggiungo al mese 'M' un valore +1 .add(number, 'String')
+    $('#prev').prop('disabled', false);
+    if (primaData.isSameOrAfter(limiteFinale)) {
+        alert('Hai provato ad hackerarmi!');
+    } else {
+        $('#calendar').empty();
+        primaData.add(1, 'M');
+        primoGiorno = primaData.isoWeekday();
+        console.log(primoGiorno);
+        aggiungiGiorniVuoti(primoGiorno);
         stampaGiorniMese(primaData);
         stampaFestivo(primaData);
+        if (primaData.isSameOrAfter(limiteFinale)) {
+            $('#next').prop('disabled', true);
+        }
     }
 });
 
 // al click sul bottone prev viene stampato il mese precedente
 $('#prev').click(function() {
-    if (primaData.month() > 0) {                                                // se il mese corrente è impostato su gennaio (0), non posso tornare indietro con il tasto prev
-        primaData.subtract(1, 'M');                                             // funzione subtract con moment.js - sottraggo al mese 'M' un valore        stampaGiorniMese(primaData);
+    $('#next').prop('disabled', false);
+    if (primaData.isSameOrBefore(limiteIniziale)) {
+        alert('Hai provato ad hackerarmi!');
+    } else {
+        $('#calendar').empty();
+        primaData.subtract(1, 'M');
+        primoGiorno = primaData.isoWeekday();
+        console.log(primoGiorno);
+        aggiungiGiorniVuoti(primoGiorno);
         stampaGiorniMese(primaData);
         stampaFestivo(primaData);
+        if (primaData.isSameOrBefore(limiteIniziale)) {
+            $('#prev').prop('disabled', true);
+        }
     }
 });
+
+
+// ordinamento con giorno della settimana:
+// 1- al click su next month richiedo il primo giorno della settimana qual è
+// 2- confronto il giorno della settimana ricevuto e aggiunto n li vuoti all'occorrenza con un ciclo for su un array di 7 elementi dato dai gg della settimana
+//      2.1- l'append dei li vuoti posso generarlo o con un semplice append o con un nuovo template Handlebars vuoto
+// 3- introduco lo stesso ragionamento per il prev. ----> creo funzione da richiamare con la pressione dei due tasti e nel caso statico
 
 
 function stampaFestivo(primaData) {
@@ -47,10 +80,9 @@ function stampaFestivo(primaData) {
 
 
 function stampaGiorniMese(meseDaStampare) {
-    $('#calendar').empty();
     var standardDay = meseDaStampare.clone();
-    var giorniMese = primaData.daysInMonth();
-    var nomeMese = primaData.format('MMMM');
+    var giorniMese = meseDaStampare.daysInMonth();
+    var nomeMese = meseDaStampare.format('MMMM');
     $('#nome-mese').text(nomeMese);                                             // modifico il nome del mese nel top-calendar
     for (var i = 1; i <= giorniMese; i++) {
         var output = {
@@ -62,3 +94,10 @@ function stampaGiorniMese(meseDaStampare) {
         standardDay.add(1, 'day');
     }
 };
+
+function aggiungiGiorniVuoti(primoGiornoMese) {
+    for (var i = 1; i < primoGiornoMese; i++) {
+        console.log(i);
+        $('#calendar').append('<li></li>');
+    }
+}
