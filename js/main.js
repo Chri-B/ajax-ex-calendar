@@ -4,13 +4,16 @@ var templateGiorno = Handlebars.compile(htmlGiorno);
 
 var primaData = moment('2018-01-01');                                          // prima data disponibile
 var primoGiorno = primaData.isoWeekday();
-console.log(primoGiorno);
 var limiteIniziale = moment('2018-01-01');
 var limiteFinale = moment('2018-12-01');
 
 aggiungiGiorniVuoti(primoGiorno);
-stampaGiorniMese(primaData);                                                    // inizializzazione calendario
+var giorniMeseCorrente = stampaGiorniMese(primaData); // salvo in una variabile il numero di giorni del mese corrente
 stampaFestivo(primaData);
+var quadratiniMancanti = (7 - ((giorniMeseCorrente + primoGiorno - 1) % 7) + 1); // calcolo il numero di quadratini necessari a completare la griglia del calendario tenendo conto che il ciclo ha come condizione strettamente minore
+if (quadratiniMancanti != 8) { // nel caso il numero fosse uguale a 8, non aggiungo una riga intera di quadratini.
+    aggiungiGiorniVuoti(quadratiniMancanti);
+}
 
 // al click sul bottone next viene stampato il mese successivo
 $('#next').click(function() {
@@ -21,9 +24,12 @@ $('#next').click(function() {
         $('#calendar').empty();
         primaData.add(1, 'M');
         primoGiorno = primaData.isoWeekday();
-        console.log(primoGiorno);
         aggiungiGiorniVuoti(primoGiorno);
-        stampaGiorniMese(primaData);
+        var giorniMeseCorrente = stampaGiorniMese(primaData);
+        quadratiniMancanti = (7 - ((giorniMeseCorrente + primoGiorno - 1) % 7) + 1);
+        if (quadratiniMancanti != 8) {
+            aggiungiGiorniVuoti(quadratiniMancanti);
+        }
         stampaFestivo(primaData);
         if (primaData.isSameOrAfter(limiteFinale)) {
             $('#next').prop('disabled', true);
@@ -40,9 +46,12 @@ $('#prev').click(function() {
         $('#calendar').empty();
         primaData.subtract(1, 'M');
         primoGiorno = primaData.isoWeekday();
-        console.log(primoGiorno);
         aggiungiGiorniVuoti(primoGiorno);
-        stampaGiorniMese(primaData);
+        var giorniMeseCorrente = stampaGiorniMese(primaData);
+        quadratiniMancanti = (7 - ((giorniMeseCorrente + primoGiorno - 1) % 7) + 1);
+        if (quadratiniMancanti != 8) {
+            aggiungiGiorniVuoti(quadratiniMancanti);
+        }
         stampaFestivo(primaData);
         if (primaData.isSameOrBefore(limiteIniziale)) {
             $('#prev').prop('disabled', true);
@@ -51,19 +60,13 @@ $('#prev').click(function() {
 });
 
 
-// ordinamento con giorno della settimana:
-// 1- al click su next month richiedo il primo giorno della settimana qual è
-// 2- confronto il giorno della settimana ricevuto e aggiunto n li vuoti all'occorrenza con un ciclo for su un array di 7 elementi dato dai gg della settimana
-//      2.1- l'append dei li vuoti posso generarlo o con un semplice append o con un nuovo template Handlebars vuoto
-// 3- introduco lo stesso ragionamento per il prev. ----> creo funzione da richiamare con la pressione dei due tasti e nel caso statico
-
-
+// funzione per richiedere i giorni festivi in un mese
 function stampaFestivo(primaData) {
     $.ajax({
         url: 'https://flynn.boolean.careers/exercises/api/holidays',
         method: 'GET',
         data: {
-            year: 2018,
+            year: primaData.year(),
             month: primaData.month()
         },
         success: function (data) {
@@ -78,12 +81,12 @@ function stampaFestivo(primaData) {
     });
 };
 
-
+// funzione per stampare i giorni del mese e dare come valore in uscita il numero di giorni nel mese
 function stampaGiorniMese(meseDaStampare) {
     var standardDay = meseDaStampare.clone();
-    var giorniMese = meseDaStampare.daysInMonth();
+    var giorniMese = meseDaStampare.daysInMonth(); // variabile globale per
     var nomeMese = meseDaStampare.format('MMMM');
-    $('#nome-mese').text(nomeMese);                                             // modifico il nome del mese nel top-calendar
+    $('#nome-mese').text(nomeMese); // modifico il nome del mese nel top-calendar
     for (var i = 1; i <= giorniMese; i++) {
         var output = {
             day: i + ' ' + nomeMese,
@@ -93,11 +96,12 @@ function stampaGiorniMese(meseDaStampare) {
         $('#calendar').append(templateFinale);
         standardDay.add(1, 'day');
     }
+    return giorniMese; // return giorniMese per utilizzarlo in un'altra funzione
 };
 
-function aggiungiGiorniVuoti(primoGiornoMese) {
-    for (var i = 1; i < primoGiornoMese; i++) {
-        console.log(i);
+// funzione per aggiungere una serie di quadratini vuoti nella griglia del calendario
+function aggiungiGiorniVuoti(limiteSupGiorni) {
+    for (var i = 1; i < limiteSupGiorni; i++) {
         $('#calendar').append('<li></li>');
     }
 }
